@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Crew Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111827;
+      --bg-card: #1f2937;
+      --bg-card-inner: #283548;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.16);
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --accent: #f0a832;
+      --accent-dim: rgba(240,168,50,0.15);
+      --tag-bg: rgba(255,255,255,0.07);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    header span {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: calc(100vh - 61px);
+    }
+
+    /* Sidebar */
+    aside {
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+    }
+
+    aside h2 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+      padding: 0 0.5rem;
+    }
+
+    .event-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 2px;
+    }
+
+    .event-btn:hover {
+      background: var(--tag-bg);
+      color: var(--text);
+    }
+
+    .event-btn.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .event-btn .ev-name {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-btn .ev-date {
+      display: block;
+      font-size: 0.75rem;
+      font-family: 'IBM Plex Mono', monospace;
+      opacity: 0.65;
+      margin-top: 2px;
+    }
+
+    /* Main */
+    main {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .event-header {
+      margin-bottom: 2rem;
+    }
+
+    .event-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .event-meta {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .event-meta span::before {
+      content: '◈ ';
+      opacity: 0.5;
+    }
+
+    /* Summary bar */
+    .summary-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 0.3rem 0.75rem 0.3rem 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .chip-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chip-name { font-weight: 500; color: var(--text); }
+    .chip-time {
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+
+    /* Timeline grid */
+    .timeline-section { margin-bottom: 1.5rem; }
+
+    .timeline-section h3 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    .crew-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .crew-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      transition: border-color 0.15s;
+    }
+
+    .crew-card:hover { border-color: var(--border-hover); }
+
+    .crew-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.875rem;
+    }
+
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      color: white;
+    }
+
+    .crew-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      flex: 1;
+    }
+
+    .arrival-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    /* Task timeline */
+    .task-timeline {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      flex-shrink: 0;
+    }
+
+    .task-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .task-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid;
+      background: var(--bg-card);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .task-line {
+      height: 2px;
+      width: 2rem;
+      align-self: flex-start;
+      margin-top: 8px;
+    }
+
+    .task-last-line {
+      display: none;
+    }
+
+    .task-block {
+      display: flex;
+      flex-direction: column;
+      padding: 0 0 0 0.5rem;
+      min-width: 110px;
+      max-width: 180px;
+    }
+
+    .task-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-bottom: 0.2rem;
+    }
+
+    .task-label {
+      background: var(--bg-card-inner);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    /* Empty state */
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 50vh;
+      text-align: center;
+      color: var(--text-dim);
+    }
+
+    .empty-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+    }
+
+    .empty h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .empty p {
+      font-size: 0.85rem;
+      max-width: 280px;
+    }
+
+    /* Loading */
+    .loading {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* Error */
+    .error-note {
+      background: rgba(220,60,60,0.1);
+      border: 1px solid rgba(220,60,60,0.2);
+      color: #f87171;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .layout { grid-template-columns: 1fr; }
+      aside {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 1rem;
+      }
+      aside h2 { display: none; }
+      .event-btn { width: auto; padding: 0.4rem 0.75rem; }
+      .event-btn .ev-date { display: none; }
+      main { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-dot"></div>
+    <h1>Event Crew Planner</h1>
+    <span id="event-count"></span>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <h2>Events</h2>
+      <div id="sidebar-list"><p class="loading">Lädt…</p></div>
+    </aside>
+    <main id="main-content">
+      <div class="empty">
+        <div class="empty-icon">📋</div>
+        <h3>Event auswählen</h3>
+        <p>Wähle ein Event aus der Liste, um den Crew-Plan anzuzeigen.</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let eventsData = [];
+    let activeId = null;
+
+    async function loadEvents() {
+      try {
+        const res = await fetch('./events.json');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        eventsData = await res.json();
+        renderSidebar();
+        document.getElementById('event-count').textContent = eventsData.length + ' Event' + (eventsData.length !== 1 ? 's' : '');
+        if (eventsData.length > 0) selectEvent(eventsData[0].id);
+      } catch (e) {
+        document.getElementById('sidebar-list').innerHTML = '<p style="color:#f87171;font-size:0.8rem;padding:0.5rem">Fehler beim Laden der events.json</p>';
+        console.error(e);
+      }
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function initials(name) {
+      return name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+    }
+
+    function renderSidebar() {
+      const list = document.getElementById('sidebar-list');
+      list.innerHTML = eventsData.map(ev => `
+        <button class="event-btn" data-id="${ev.id}" onclick="selectEvent('${ev.id}')">
+          <span class="ev-name">${ev.name}</span>
+          <span class="ev-date">${formatDate(ev.date)}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectEvent(id) {
+      activeId = id;
+      document.querySelectorAll('.event-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.id === id);
+      });
+      const ev = eventsData.find(e => e.id === id);
+      if (ev) renderEvent(ev);
+    }
+
+    function renderEvent(ev) {
+      const main = document.getElementById('main-content');
+
+      const summaryChips = ev.crew.map(p => `
+        <div class="summary-chip">
+          <div class="chip-dot" style="background:${p.color}"></div>
+          <span class="chip-name">${p.name}</span>
+          <span class="chip-time">ab ${p.arrival}</span>
+        </div>
+      `).join('');
+
+      const crewCards = ev.crew.map(p => {
+        const taskItems = p.tasks.map((t, i) => {
+          const isLast = i === p.tasks.length - 1;
+          return `
+            <div class="task-item">
+              <div class="task-connector">
+                <div class="task-dot" style="border-color:${p.color}"></div>
+                ${!isLast ? `<div class="task-line" style="background:${p.color};opacity:0.3"></div>` : ''}
+              </div>
+              <div class="task-block">
+                <div class="task-time">${t.time}</div>
+                <div class="task-label">${t.label}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="crew-card">
+            <div class="crew-card-header">
+              <div class="avatar" style="background:${p.color}">${initials(p.name)}</div>
+              <span class="crew-name">${p.name}</span>
+              <span class="arrival-badge">ab ${p.arrival}</span>
+            </div>
+            <div class="task-timeline">${taskItems}</div>
+          </div>
+        `;
+      }).join('');
+
+      main.innerHTML = `
+        <div class="event-header">
+          <h2>${ev.name}</h2>
+          <div class="event-meta">
+            <span>${formatDate(ev.date)}</span>
+            <span>${ev.location}</span>
+            <span>${ev.crew.length} Personen</span>
+          </div>
+        </div>
+        <div class="summary-bar">${summaryChips}</div>
+        <div class="timeline-section">
+          <h3>Crew & Aufgaben</h3>
+          <div class="crew-grid">${crewCards}</div>
+        </div>
+      `;
+    }
+
+    loadEvents();
+  </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "sommerfest-2025",
+    "name": "Sommerfest 2025",
+    "date": "2025-08-15",
+    "location": "Stadtpark Lüchow",
+    "crew": [
+      {
+        "name": "Hans",
+        "arrival": "16:30",
+        "color": "#4A90D9",
+        "tasks": [
+          { "time": "16:30", "label": "Ankunft & Aufbau" },
+          { "time": "18:00", "label": "Tontechnik" }
+        ]
+      },
+      {
+        "name": "Ole",
+        "arrival": "17:15",
+        "color": "#7B68EE",
+        "tasks": [
+          { "time": "17:15", "label": "Licht aufbauen" },
+          { "time": "18:30", "label": "Aufbau mithelfen" }
+        ]
+      },
+      {
+        "name": "Mia",
+        "arrival": "15:00",
+        "color": "#E07B54",
+        "tasks": [
+          { "time": "15:00", "label": "Koordination & Einlass" },
+          { "time": "17:00", "label": "Catering-Aufbau" },
+          { "time": "20:00", "label": "Kasse" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "weihnachtsfeier-2025",
+    "name": "Weihnachtsfeier 2025",
+    "date": "2025-12-20",
+    "location": "Gemeindehaus Dannenberg",
+    "crew": [
+      {
+        "name": "Hans",
+        "arrival": "14:00",
+        "color": "#4A90D9",
+        "tasks": [
+          { "time": "14:00", "label": "Aufbau Bühne" },
+          { "time": "16:00", "label": "Soundcheck" },
+          { "time": "19:00", "label": "Tontechnik" }
+        ]
+      },
+      {
+        "name": "Lena",
+        "arrival": "15:00",
+        "color": "#5BAD8F",
+        "tasks": [
+          { "time": "15:00", "label": "Dekoration" },
+          { "time": "18:00", "label": "Einlass & Begrüßung" }
+        ]
+      }
+    ]
+  }
+]
