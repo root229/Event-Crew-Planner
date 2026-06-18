@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crew Planer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <button class="header-toggle" id="toggleSidebar" aria-label="Sidebar ein-/ausblenden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <span class="header-title">Crew Planer</span>
+    <span class="header-subtitle" id="headerMeta"></span>
+  </header>
+
+  <div class="body">
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Events</div>
+        <div id="sidebarEvents"><p class="state-loading">Lädt…</p></div>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Personen</div>
+        <div id="sidebarPersons"><p class="state-loading">Lädt…</p></div>
+      </div>
+
+      <!-- Footer: Platz für Impressum etc. -->
+      <div class="sidebar-footer">
+        <!-- Beispiel:
+        <a href="impressum.html" class="sidebar-btn">
+          <span>Impressum</span>
+        </a>
+        -->
+      </div>
+
+    </nav>
+
+    <!-- Main content area -->
+    <main class="main" id="main">
+      <div class="state-empty">
+        <h3>Event auswählen</h3>
+        <p>Wähle ein Event oder eine Person aus der Sidebar.</p>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script>
+/* ── State ─────────────────────────────────────────── */
+let data = null;
+let sidebarOpen = true;
+let activeEventId = null;
+let activePersonId = null;
+
+/* ── Boot ───────────────────────────────────────────── */
+async function boot() {
+  try {
+    const res = await fetch('./data.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    data = await res.json();
+    buildSidebar();
+    if (data.events.length > 0) showEvent(data.events[0].id);
+  } catch (e) {
+    document.getElementById('main').innerHTML =
+      `<div class="state-error">Fehler beim Laden der data.json: ${e.message}</div>`;
+  }
+}
+
+/* ── Sidebar ────────────────────────────────────────── */
+function buildSidebar() {
+  // Events
+  document.getElementById('sidebarEvents').innerHTML = data.events.map(ev => `
+    <button class="sidebar-btn" id="sb-ev-${ev.id}" onclick="showEvent('${ev.id}')">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ev.name}</span>
+      <span class="sb-date">${formatDateShort(ev.date)}</span>
+    </button>
+  `).join('');
+
+  // Persons
+  document.getElementById('sidebarPersons').innerHTML = data.persons.map(p => `
+    <button class="sidebar-btn" id="sb-p-${p.id}" onclick="showPerson('${p.id}')">
+      <div class="sb-avatar" style="background:${p.color}">${initials(p.name)}</div>
+      <span>${p.name}</span>
+    </button>
+  `).join('');
+}
+
+function setActive(elId) {
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(elId);
+  if (el) el.classList.add('active');
+}
+
+/* ── Toggle sidebar ─────────────────────────────────── */
+document.getElementById('toggleSidebar').addEventListener('click', () => {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+});
+
+/* ── Event view ─────────────────────────────────────── */
+function showEvent(id) {
+  activeEventId = id;
+  activePersonId = null;
+  setActive('sb-ev-' + id);
+
+  const ev = data.events.find(e => e.id === id);
+  if (!ev) return;
+
+  document.getElementById('headerMeta').textContent = formatDateLong(ev.date);
+
+  const rows = ev.assignments.map(a => {
+    const task = data.tasks.find(t => t.id === a.taskId);
+    const chips = a.persons.map(pid => {
+      const p = data.persons.find(x => x.id === pid);
+      if (!p) return '';
+      return `<button class="person-chip"
+          style="color:${p.color};border-color:${p.color}22;background:${p.color}11"
+          onclick="showPerson('${p.id}')"
+          title="${p.name} – Profil anzeigen">
+        <span class="person-chip-dot" style="background:${p.color}"></span>
+        ${p.name}
+      </button>`;
+    }).join('');
+
+    const timeCell = a.time
+      ? `<span class="task-time">${a.time}</span>`
+      : `<span class="task-time" style="color:var(--text-dim)">–</span>`;
+
+    return `<tr>
+      <td>${timeCell}</td>
+      <td><span class="task-name">${task ? task.label : a.taskId}</span></td>
+      <td><div class="person-chips">${chips}</div></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('main').innerHTML = `
+    <div class="event-header">
+      <h1>${ev.name}</h1>
+      <div class="event-date">${formatDateLong(ev.date)}</div>
+    </div>
+
+    <table class="task-table">
+      <thead>
+        <tr>
+          <th>Zeit</th>
+          <th>Aufgabe</th>
+          <th>Zuständig</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+
+  // On mobile: close sidebar after selection
+  if (window.innerWidth <= 680) {
+    sidebarOpen = false;
+    document.getElementById('sidebar').classList.add('collapsed');
+  }
+}
+
+/* ── Person profile view ────────────────────────────── */
+function showPerson(id) {
+  activePersonId = id;
+  setActive('sb-p-' + id);
+
+  const person = data.persons.find(p => p.id === id);
+  if (!person) return;
+
+  // Count events this person is in
+  const eventCount = data.events.filter(ev =>
+    ev.assignments.some(a => a.persons.includes(id))
+  ).length;
+
+  document.getElementById('headerMeta').textContent = `${eventCount} Event${eventCount !== 1 ? 's' : ''}`;
+
+  // Build per-event blocks
+  const eventBlocks = data.events.map(ev => {
+    const myTasks = ev.assignments.filter(a => a.persons.includes(id));
+    if (myTasks.length === 0) return '';
+
+    const taskRows = myTasks.map(a => {
+      const task = data.tasks.find(t => t.id === a.taskId);
+      const timeClass = a.time ? '' : ' no-time';
+      const timeLabel = a.time ? a.time : '–';
+      return `<div class="profile-task-row">
+        <span class="profile-task-time${timeClass}">${timeLabel}</span>
+        <span class="profile-task-label">${task ? task.label : a.taskId}</span>
+      </div>`;
+    }).join('');
+
+    return `<div class="profile-event-block">
+      <div class="profile-event-name">${ev.name} · ${formatDateLong(ev.date)}</div>
+      <div class="profile-task-list">${taskRows}</div>
+    </div>`;
+  }).join('');
+
+  const hasAnyTask = data.events.some(ev =>
+    ev.assignments.some(a => a.persons.includes(id))
+  );
+
+  document.getElementById('main').innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar" style="background:${person.color}">${initials(person.name)}</div>
+      <div>
+        <div class="profile-name">${person.name}</div>
+        <div class="profile-meta">${eventCount} Event${eventCount !== 1 ? 's' : ''} eingeplant</div>
+      </div>
+      ${activeEventId ? `<button class="profile-back" onclick="showEvent('${activeEventId}')">← Zurück</button>` : ''}
+    </div>
+
+    ${hasAnyTask
+      ? eventBlocks
+      : '<p class="profile-no-tasks">Keine Aufgaben eingetragen.</p>'}
+  `;
+
+  if (window.innerWidth <= 680) {
+    sidebarOpen = false;
+    document.getElementById('sidebar').classList.add('collapsed');
+  }
+}
+
+/* ── Helpers ─────────────────────────────────────────── */
+function initials(name) {
+  return name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function formatDateShort(str) {
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+}
+
+function formatDateLong(str) {
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/* ── Start ───────────────────────────────────────────── */
+boot();
+</script>
+</body>
+</html>

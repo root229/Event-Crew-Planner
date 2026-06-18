@@ -1,0 +1,130 @@
+{
+  "persons": [
+    { "id": "hans",  "name": "Hans",  "color": "#4f6ef7" },
+    { "id": "ole",   "name": "Ole",   "color": "#e05c8a" },
+    { "id": "mia",   "name": "Mia",   "color": "#2aab7a" },
+    { "id": "lena",  "name": "Lena",  "color": "#e08c2a" },
+    { "id": "tom",   "name": "Tom",   "color": "#9b5de5" },
+    { "id": "sara",  "name": "Sara",  "color": "#00b4d8" },
+    { "id": "felix", "name": "Felix", "color": "#e05c2a" },
+    { "id": "anna",  "name": "Anna",  "color": "#3cb371" }
+  ],
+
+  "tasks": [
+    { "id": "aufbau-buehne",  "label": "Bühne aufbauen" },
+    { "id": "aufbau-ton",     "label": "Ton-Aufbau" },
+    { "id": "aufbau-licht",   "label": "Licht-Aufbau" },
+    { "id": "soundcheck",     "label": "Soundcheck" },
+    { "id": "einlass",        "label": "Einlass" },
+    { "id": "kasse",          "label": "Kasse" },
+    { "id": "tontechnik",     "label": "Tontechnik (live)" },
+    { "id": "lichttechnik",   "label": "Lichttechnik (live)" },
+    { "id": "catering",       "label": "Catering-Aufbau" },
+    { "id": "abbau",          "label": "Abbau" }
+  ],
+
+  "events": [
+    {
+      "id": "sommerfest-2025",
+      "name": "Sommerfest 2025",
+      "date": "2025-08-15",
+      "assignments": [
+        {
+          "taskId": "aufbau-buehne",
+          "time": "15:00",
+          "persons": ["hans", "tom", "felix"]
+        },
+        {
+          "taskId": "aufbau-ton",
+          "time": "15:30",
+          "persons": ["hans", "ole"]
+        },
+        {
+          "taskId": "aufbau-licht",
+          "time": "15:30",
+          "persons": ["ole", "lena"]
+        },
+        {
+          "taskId": "catering",
+          "time": "16:00",
+          "persons": ["mia", "anna"]
+        },
+        {
+          "taskId": "soundcheck",
+          "time": "17:00",
+          "persons": ["hans", "ole"]
+        },
+        {
+          "taskId": "einlass",
+          "time": "18:00",
+          "persons": ["sara", "anna"]
+        },
+        {
+          "taskId": "kasse",
+          "time": "18:00",
+          "persons": ["mia"]
+        },
+        {
+          "taskId": "tontechnik",
+          "time": "19:00",
+          "persons": ["hans"]
+        },
+        {
+          "taskId": "lichttechnik",
+          "time": "19:00",
+          "persons": ["ole"]
+        },
+        {
+          "taskId": "abbau",
+          "persons": ["tom", "felix", "lena", "sara"]
+        }
+      ]
+    },
+    {
+      "id": "weihnachtsfeier-2025",
+      "name": "Weihnachtsfeier 2025",
+      "date": "2025-12-20",
+      "assignments": [
+        {
+          "taskId": "aufbau-buehne",
+          "time": "14:00",
+          "persons": ["hans", "felix"]
+        },
+        {
+          "taskId": "aufbau-ton",
+          "time": "14:30",
+          "persons": ["hans"]
+        },
+        {
+          "taskId": "aufbau-licht",
+          "time": "14:30",
+          "persons": ["lena"]
+        },
+        {
+          "taskId": "soundcheck",
+          "time": "16:00",
+          "persons": ["hans", "ole"]
+        },
+        {
+          "taskId": "einlass",
+          "time": "17:30",
+          "persons": ["anna", "sara"]
+        },
+        {
+          "taskId": "tontechnik",
+          "time": "18:00",
+          "persons": ["hans"]
+        },
+        {
+          "taskId": "lichttechnik",
+          "time": "18:00",
+          "persons": ["ole"]
+        },
+        {
+          "taskId": "abbau",
+          "persons": ["felix", "tom", "lena"]
+        }
+      ]
+    }
+  ]
+}
