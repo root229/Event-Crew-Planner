@@ -7,8 +7,8 @@
     { "id": "ahlkil",   "name": "AhlKil",   "color": "#9b5de5" },
     { "id": "bralou",  "name": "BraLou",  "color": "#00b4d8" },
     { "id": "fenman", "name": "FenMan", "color": "#e05c2a" },
-    { "id": "stemar",  "name": "SteMar",  "color": "#3cb371" }
-    { "id": "branik", "name": "BraNik", "color": "#40ace8" }
+    { "id": "stemar",  "name": "SteMar",  "color": "#3cb371" },
+    { "id": "branik", "name": "BraNik", "color": "#40ace8" },
     { "id": "breluk", "name": "BreLuk", "color": "#54910d" }
   ],
 
