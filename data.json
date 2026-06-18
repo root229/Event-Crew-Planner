@@ -23,6 +23,7 @@
     {
       "id": "abientlassung-2026",
       "name": "Abientlassung 2026",
+      "desc": "Abientlassung des Abijahrgangs 2026 mit Reden und einem Auftritt des Chors und dem Instru",
       "date": "2026-06-25",
       "assignments": [
         {
@@ -43,6 +44,33 @@
         {
           "taskId": "abbau",
           "persons": ["breluk", "fenman", "grijon"]
+        }
+      ]
+    },
+     {
+      "id": "beispielkonzert",
+      "name": "Beispielkonzert 2067",
+      "desc": "Test",
+      "date": "2067-06-07",
+      "assignments": [
+        {
+          "taskId": "aufbau",
+          "time": "14:00",
+          "persons": ["grijon", "breluk", "fenman"]
+        },
+        {
+          "taskId": "tontechnik",
+          "time": "16:00",
+          "persons": ["bralou", "dewjoh"]
+        },
+        {
+          "taskId": "lichttechnik",
+          "time": "16:00",
+          "persons": ["könire", "deeame","branik"]
+        },
+        {
+          "taskId": "abbau",
+          "persons": ["ahlkil", "stemar"]
         }
       ]
     }
